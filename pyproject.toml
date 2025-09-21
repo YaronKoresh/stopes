@@ -1,6 +1,6 @@
 [build-system]
-requires = ["flit_core >=3.2,<4", "setuptools"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "stopes"
@@ -8,7 +8,6 @@ readme = "README.md"
 authors = [{name = "Facebook AI Research"}]
 requires-python = ">=3.9"
 dynamic = ["version", "description"]
-
 dependencies = [
   "hydra-core>=1.2.0",
   "joblib",
@@ -16,7 +15,6 @@ dependencies = [
   "tqdm",
   "pyarrow>=16.1.0"
 ]
-# zip_safe = false
 classifiers=[
     "License :: OSI Approved :: MIT License",
     "Topic :: Scientific/Engineering",
@@ -28,219 +26,184 @@ classifiers=[
   Tracker = "https://github.com/facebookresearch/stopes/issues"
 
 [project.optional-dependencies]
-  mono = [
-    "xxhash",
-    "fasttext",
-    "sentence_splitter",
-    # "kenlm",
-    "sacremoses",
-    "sentencepiece",
-    "indic-nlp-library",
-    "emoji",
+  _common = [
+    "numpy~=1.26.4",
+    "pandas~=2.2.2",
+    "scipy~=1.13.1",
+    "torch~=2.3.1",
+    "transformers~=4.41.2",
+    "nltk~=3.8.1",
+    "xxhash~=3.4.1",
+    "sacremoses~=0.1.1",
+    "sentencepiece~=0.2.0",
+  ]
+  _text-core = [
+    "botok~=1.1.0",
+    "emoji~=2.12.1",
+    "fasttext~=0.9.3",
+    "hasami~=0.5.2",
+    "indic-nlp-library~=0.81",
+    "khmer-nltk~=1.7",
+    "laonlp~=1.0.1",
     "pythainlp==4.0.2",
-    "hasami",  # Japanese sentence segmentation
-    "botok",
-    "khmer-nltk",
-    "laonlp",
+    "sentence_splitter~=1.4",
   ]
-  mining = [
-    "requests",
-    "fairscale",
-   # "fairseq==0.12.1",
-    "faiss-cpu",
-    "sentencepiece",
-    "numpy>=1.21",
+  _speech-core = [
+    "demucs~=4.1.0",
+    "encodec~=0.1.1",
+    "ipapy~=0.1.0",
+    "librosa~=0.10.2",
+    "num2words~=0.5.13",
+    "numba~=0.59.1",
+    "phonemizer~=3.2.1",
+    "syllables~=1.0.9",
+    "tnkeeh~=0.1.3",
+    "torchaudio~=2.3.1",
+    "unidecode~=1.3.8",
   ]
-  mining_gpu = [
-    "faiss-gpu",
-  ]
-  speech = [
-    "hanziconv",
-    "inflect",
-    "tnkeeh",
-    "torchaudio",
-    "num2words",
-    "pandas",
-    "unidecode",
-    "transformers",
-    "whisper",
-    "encodec",
-    "demucs",
-    "librosa"
-  ]
-  video_alignment = [
-    "librosa",
-    "sentence_transformers",
-    "torchaudio",
-    "scipy",
-    "pandas",
-    "pyarrow>=16.1.0",
-    "numba",
-    "transformers",
+  _models-core = [
+    "fairseq @ git+https://github.com/YaronKoresh/fairseq.git",
     "openai-whisper==20230314",
+    "s3prl~=0.4.1",
+    "sentence_transformers~=3.0.1",
+  ]
+  _mining-core = [
+    "beautifulsoup4~=4.12.3",
+    "func_argparse~=1.2.1",
+    "requests~=2.32.3",
+    "scikit-learn~=1.5.0",
+  ]
+  _training-eval-tools = [
+    "fairscale~=0.4.13",
+    "omegaconf~=2.3.0",
+    "einops~=0.8.0",
+  ]
+  _fairseq2-pipelines = [
     "fairseq2==0.2.*",
     "sonar-space==0.2.*",
   ]
-  vocal_style_sim = [
-    "s3prl",
-  ]
-  sonar_mining = [
-    "sonar-space==0.2.*",
-    "fairseq2==0.2.*",
-  ]
+  _faiss-cpu = ["faiss-cpu~=1.8.0"]
+  _faiss-gpu = ["faiss @ https://github.com/YaronKoresh/faiss/releases/download/6470b8d/faiss-1.12.0-py3-none-manylinux_2_35_x86_64.whl"]
+
+  text = ["stopes[_common]", "stopes[_text-core]"]
+  speech = ["stopes[_common]", "stopes[_speech-core]", "stopes[_models-core]"]
+  training = ["stopes[_training-eval-tools]"]
+  evaluation = ["stopes[_training-eval-tools]"]
+  mining-cpu = ["stopes[_common]", "stopes[_mining-core]", "stopes[_faiss-cpu]"]
+  mining-gpu = ["stopes[_common]", "stopes[_mining-core]", "stopes[_faiss-gpu]"]
+
+  inference-cpu = ["stopes[text]", "stopes[speech]", "stopes[mining-cpu]", "stopes[_fairseq2-pipelines]"]
+  inference-gpu = ["stopes[text]", "stopes[speech]", "stopes[mining-gpu]", "stopes[_fairseq2-pipelines]"]
+
+  training-cpu = ["stopes[inference-cpu]", "stopes[training]", "stopes[evaluation]"]
+  training-gpu = ["stopes[inference-gpu]", "stopes[training]", "stopes[evaluation]"]
+
   dev = [
-      # Test
-      "pytest>=4.3.0",
-      "pytest-asyncio>=0.15.0",
-      "pytest-cov>=2.6.1",
-      "coverage[toml]>=5.1",
-      # Format
-      "black==22.3.0",
-      "isort>=5.12.0",
-      # Linters
-      "mypy>=1.1.1",
-      "types-emoji",
-      "types-requests",
-      "types-PyYAML",
-      "pylint>=2.8.0",
-      # Release
-      "flit>=3.5.1"
-  ]
-  hmine = [
-    "bs4",
-    "func_argparse",
-    "nltk",
-    "pandas",
-    "scipy",
-    "scikit-learn",
-    "xxhash",
-  ]
-  blaser = [
-    "scipy",
-    "numpy",
-    "torch",
-  ]
-  alti = [
-    "einops",
-    "numpy",
-    "omegaconf",
-    "torch",
-    # fairseq is also a dependency, but it must be installed separately
-  ]
-  auto_pcp = [
-    "transformers",
-    "pandas",
-    "scipy",
-  ]
-  local_prosody = [
-    "transformers",
-    "pandas",
-    "syllables",
-    "phonemizer",
-    "ipapy",
-    "nltk",
-    "sacremoses",
+      "coverage[toml]~=7.5.4",
+      "flit>=3.9.0",
+      "mypy~=1.10.0",
+      "pytest~=8.2.2",
+      "pytest-asyncio~=0.23.7",
+      "pytest-cov~=5.0.0",
+      "ruff~=0.5.0",
+      "types-emoji~=2.11.0",
+      "types-PyYAML~=6.0.12",
+      "types-requests~=2.32.0",
   ]
 
-[tool.black]
-# Black defaults are great !
+[tool.ruff]
+line-length = 88
+select = ["I"]
 
-[tool.isort]
-profile = "black"
-skip_gitignore = true
-skip_glob = ["website/*", "*.pyx", 'ust/*']
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I"]
+ignore = []
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 show_error_codes = true
 check_untyped_defs = true
 ignore_missing_imports = true
 implicit_optional = true
 implicit_reexport = true
-
 files = [
   "stopes/"
 ]
-# Generated with: mypy | cut -d':' -f1 | uniq -c | sort -nr
-# It's only allowed to remove files, not to add more (ಠ_ಠ)
 exclude = [
-  "stopes/modules/bitext/mining/mine_bitext_indexes_utils.py", # 49
-  "stopes/pipelines/distillation/distillation_pipeline.py", # 22
-  "stopes/eval/blaser/model.py", # 22
-  "stopes/pipelines/filtering/filter.py", # 12
-  "stopes/modules/preprocess/split_in_shards.py", # 12
-  "stopes/modules/bitext/mining/merge_shards.py", # 12
-  "stopes/eval/blaser/train.py", # 12
-  "stopes/modules/speech/shas/shas.py", # 11
-  "stopes/utils/tts_preprocessing/cmn.py", # 10
-  "stopes/pipelines/bitext/shard_and_shuffle.py", # 10
-  "stopes/pipelines/prepare_data/prepare_data.py", # 9
-  "stopes/pipelines/monolingual/dedup_files.py", # 9
-  "stopes/modules/bitext/mining/mine_bitext_sentences_utils.py", # 9
-  "stopes/eval/blaser/score.py", # 9
-  "stopes/eval/alti/alignment/align.py", # 9
-  "stopes/modules/tests/test_mine_index_utils.py", # 8
-  "stopes/modules/preprocess/laser_sentence_encoder.py", # 8
-  "stopes/utils/embedding_utils.py", # 7
-  "stopes/pipelines/monolingual/monolingual_pipeline.py", # 7
-  "stopes/modules/tests/test_populate_index_port.py", # 7
-  "stopes/modules/speech/whisper.py", # 7
-  "stopes/core/jobs_registry/registry.py", # 7
-  "stopes/pipelines/prepare_data/dedup_sharding.py", # 6
-  "stopes/pipelines/filtering/scripts/populate_data_conf.py", # 6
-  "stopes/pipelines/distillation/distillation_bitext_processor.py", # 6
-  "stopes/pipelines/bitext/ExtractMetaLineProc.py", # 6
-  "stopes/modules/tests/test_split_merge_langs.py", # 6
-  "stopes/core/jobs_registry/submitit_slurm_job.py", # 6
-  "stopes/pipelines/prepare_data/validate.py", # 5
-  "stopes/pipelines/monolingual/monolingual_line_processor.py", # 5
-  "stopes/pipelines/filtering/filters/lid.py", # 5
-  "stopes/modules/preprocess/multiproc_bitext_processor.py", # 5
-  "stopes/modules/evaluation/generate_multi_bleu_detok_module.py", # 5
-  "stopes/modules/bitext/indexing/populate_faiss_index.py", # 5
-  "stopes/utils/tts_preprocessing/numbers/__init__.py", # 4
-  "stopes/modules/translation/fairseq_generate.py", # 4
-  "stopes/modules/speech/shas/data.py", # 4
-  "stopes/eval/alti/wrappers/transformer_wrapper.py", # 4
-  "stopes/eval/alti/wrappers/multilingual_transformer_wrapper.py", # 4
-  "stopes/eval/alti/alti_metrics/nllb_alti_detector.py", # 4
-  "stopes/core/jobs_registry/stopes_job.py", # 4
-  "stopes/pipelines/translate/translation_pipeline.py", # 3
-  "stopes/pipelines/prepare_data/build_vocab.py", # 3
-  "stopes/pipelines/eval/eval_blaser.py", # 3
-  "stopes/pipelines/bitext/dedup_local_and_global.py", # 3
-  "stopes/pipelines/bitext/bitext_eval.py", # 3
-  "stopes/modules/tests/test_embedding_utils.py", # 3
-  "stopes/modules/preprocess/mining_speech_encoder.py", # 3
-  "stopes/modules/bitext/mining/calculate_distances.py", # 3
-  "stopes/utils/tts_preprocessing/cleaners.py", # 2
-  "stopes/pipelines/monolingual/utils/predict_lid.py", # 2
-  "stopes/pipelines/bitext/nmt_bitext_eval.py", # 2
-  "stopes/modules/tests/test_text_input.py", # 2
-  "stopes/modules/preprocess/multiproc_line_processor.py", # 2
-  "stopes/modules/bitext/indexing/sample_embedding_module.py", # 2
+  "stopes/modules/bitext/mining/mine_bitext_indexes_utils.py",
+  "stopes/pipelines/distillation/distillation_pipeline.py",
   "stopes/eval/blaser/model.py",
+  "stopes/pipelines/filtering/filter.py",
+  "stopes/modules/preprocess/split_in_shards.py",
+  "stopes/modules/bitext/mining/merge_shards.py",
   "stopes/eval/blaser/train.py",
+  "stopes/modules/speech/shas/shas.py",
+  "stopes/utils/tts_preprocessing/cmn.py",
+  "stopes/pipelines/bitext/shard_and_shuffle.py",
+  "stopes/pipelines/prepare_data/prepare_data.py",
+  "stopes/pipelines/monolingual/dedup_files.py",
+  "stopes/modules/bitext/mining/mine_bitext_sentences_utils.py",
   "stopes/eval/blaser/score.py",
-  "stopes/ust_common/evaluation.py", # 92
-  "stopes/ust_common/text/numbers.py", # 25
-  "stopes/ust_common/tabulation.py", # 15
-  "stopes/ust_common/text/cn_tn.py", # 10
-  "stopes/ust_common/agg_results.py", # 9
-  "stopes/ust_common/sweep_utils.py", # 8
-  "stopes/ust_common/lib/audio.py", # 8
-  "stopes/ust_common/lib/manifests.py", # 7
-  "stopes/ust_common/lib/lpc.py", # 6
-  "stopes/ust_common/generation/asr_utils.py", # 6
-  "stopes/ust_common/viewer/notebook.py", # 5
-  "stopes/ust_common/lib/webrtc_vad.py", # 5
-  "stopes/ust_common/lib/__init__.py", # 5
-  "stopes/ust_common/generation/tts_utils.py", # 4
-  "stopes/ust_common/sweep/slurm.py", # 2
-  "stopes/ust_common/sweep/fblearner.py", # 1
-  "stopes/ust_common/lib/f0.py", # 1
-  "stopes/ust_common/generation/vocoder_utils/vocoder.py", # 1
-  "stopes/ust_common/utils/model_export.py", # 1
+  "stopes/eval/alti/alignment/align.py",
+  "stopes/modules/tests/test_mine_index_utils.py",
+  "stopes/modules/preprocess/laser_sentence_encoder.py",
+  "stopes/utils/embedding_utils.py",
+  "stopes/pipelines/monolingual/monolingual_pipeline.py",
+  "stopes/modules/tests/test_populate_index_port.py",
+  "stopes/modules/speech/whisper.py",
+  "stopes/core/jobs_registry/registry.py",
+  "stopes/pipelines/prepare_data/dedup_sharding.py",
+  "stopes/pipelines/filtering/scripts/populate_data_conf.py",
+  "stopes/pipelines/distillation/distillation_bitext_processor.py",
+  "stopes/pipelines/bitext/ExtractMetaLineProc.py",
+  "stopes/modules/tests/test_split_merge_langs.py",
+  "stopes/core/jobs_registry/submitit_slurm_job.py",
+  "stopes/pipelines/prepare_data/validate.py",
+  "stopes/pipelines/monolingual/monolingual_line_processor.py",
+  "stopes/pipelines/filtering/filters/lid.py",
+  "stopes/modules/preprocess/multiproc_bitext_processor.py",
+  "stopes/modules/evaluation/generate_multi_bleu_detok_module.py",
+  "stopes/modules/bitext/indexing/populate_faiss_index.py",
+  "stopes/utils/tts_preprocessing/numbers/__init__.py",
+  "stopes/modules/translation/fairseq_generate.py",
+  "stopes/modules/speech/shas/data.py",
+  "stopes/eval/alti/wrappers/transformer_wrapper.py",
+  "stopes/eval/alti/wrappers/multilingual_transformer_wrapper.py",
+  "stopes/eval/alti/alti_metrics/nllb_alti_detector.py",
+  "stopes/core/jobs_registry/stopes_job.py",
+  "stopes/pipelines/translate/translation_pipeline.py",
+  "stopes/pipelines/prepare_data/build_vocab.py",
+  "stopes/pipelines/eval/eval_blaser.py",
+  "stopes/pipelines/bitext/dedup_local_and_global.py",
+  "stopes/pipelines/bitext/bitext_eval.py",
+  "stopes/modules/tests/test_embedding_utils.py",
+  "stopes/modules/preprocess/mining_speech_encoder.py",
+  "stopes/modules/bitext/mining/calculate_distances.py",
+  "stopes/utils/tts_preprocessing/cleaners.py",
+  "stopes/pipelines/monolingual/utils/predict_lid.py",
+  "stopes/pipelines/bitext/nmt_bitext_eval.py",
+  "stopes/modules/tests/test_text_input.py",
+  "stopes/modules/preprocess/multiproc_line_processor.py",
+  "stopes/modules/bitext/indexing/sample_embedding_module.py",
+  "stopes/ust_common/evaluation.py",
+  "stopes/ust_common/text/numbers.py",
+  "stopes/ust_common/tabulation.py",
+  "stopes/ust_common/text/cn_tn.py",
+  "stopes/ust_common/agg_results.py",
+  "stopes/ust_common/sweep_utils.py",
+  "stopes/ust_common/lib/audio.py",
+  "stopes/ust_common/lib/manifests.py",
+  "stopes/ust_common/lib/lpc.py",
+  "stopes/ust_common/generation/asr_utils.py",
+  "stopes/ust_common/viewer/notebook.py",
+  "stopes/ust_common/lib/webrtc_vad.py",
+  "stopes/ust_common/lib/__init__.py",
+  "stopes/ust_common/generation/tts_utils.py",
+  "stopes/ust_common/sweep/slurm.py",
+  "stopes/ust_common/sweep/fblearner.py",
+  "stopes/ust_common/lib/f0.py",
+  "stopes/ust_common/generation/vocoder_utils/vocoder.py",
+  "stopes/ust_common/utils/model_export.py",
 ]
 
 [tool.pytest.ini_options]
@@ -253,7 +216,7 @@ python_files = [
 asyncio_mode = "auto"
 norecursedirs = [
   "ust/*",
-  "stopes/utils/aligner_utils", # it imports from a non-main branch of fairseq
-  "stopes/eval/local_prosody/unity2_forced_aligner_f1", # it imports the package above
+  "stopes/utils/aligner_utils",
+  "stopes/eval/local_prosody/unity2_forced_aligner_f1",
 ]
 asyncio_default_fixture_loop_scope = "session"
