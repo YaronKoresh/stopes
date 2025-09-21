@@ -7,7 +7,8 @@ name = "stopes"
 readme = "README.md"
 authors = [{name = "Facebook AI Research"}]
 requires-python = ">=3.9"
-dynamic = ["version", "description"]
+version = "2.2.1"
+description = "A library for preparing data for machine translation research."
 dependencies = [
   "hydra-core>=1.2.0",
   "joblib",
