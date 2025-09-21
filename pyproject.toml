@@ -293,9 +293,8 @@ dev = [
     "types-requests",
 ]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["stopes"]
+[tool.setuptools]
+py-modules = ["stopes"]
 
 [tool.ruff]
 line-length = 88
