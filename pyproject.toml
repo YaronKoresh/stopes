@@ -293,9 +293,6 @@ dev = [
     "types-requests",
 ]
 
-[tool.setuptools]
-py-modules = ["stopes"]
-
 [tool.ruff]
 line-length = 88
 select = ["I"]
