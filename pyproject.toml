@@ -154,7 +154,6 @@ inference-cpu = [
     "requests~=2.32.3",
     "scikit-learn~=1.5.0",
     "faiss-cpu~=1.8.0",
-    "fairseq2~=0.5.2",
     "sonar-space==0.2.*",
 ]
 inference-gpu = [
@@ -196,7 +195,6 @@ inference-gpu = [
     "requests~=2.32.3",
     "scikit-learn~=1.5.0",
     "faiss @ https://github.com/YaronKoresh/faiss/releases/download/6470b8d/faiss-1.12.0-py3-none-manylinux_2_35_x86_64.whl",
-    "fairseq2~=0.5.2",
     "sonar-space==0.2.*",
 ]
 training-cpu = [
@@ -238,7 +236,6 @@ training-cpu = [
     "requests~=2.32.3",
     "scikit-learn~=1.5.0",
     "faiss-cpu~=1.8.0",
-    "fairseq2~=0.5.2",
     "sonar-space==0.2.*",
     "fairscale~=0.4.13",
     "omegaconf~=2.3.0",
@@ -283,7 +280,6 @@ training-gpu = [
     "requests~=2.32.3",
     "scikit-learn~=1.5.0",
     "faiss @ https://github.com/YaronKoresh/faiss/releases/download/6470b8d/faiss-1.12.0-py3-none-manylinux_2_35_x86_64.whl",
-    "fairseq2~=0.5.2",
     "sonar-space==0.2.*",
     "fairscale~=0.4.13",
     "omegaconf~=2.3.0",
