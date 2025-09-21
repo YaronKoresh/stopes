@@ -302,6 +302,10 @@ dev = [
     "types-requests~=2.32.0",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["stopes"]
+
 [tool.ruff]
 line-length = 88
 select = ["I"]
