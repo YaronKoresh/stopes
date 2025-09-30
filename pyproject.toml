@@ -112,7 +112,7 @@ mining-gpu = [
     "func_argparse",
     "requests",
     "scikit-learn",
-    "faiss @ git+https://github.com/YaronKoresh/faiss/releases/download/6470b8d/faiss-1.12.0-py3-none-manylinux_2_35_x86_64.whl",
+    "faiss @ git+https://github.com/YaronKoresh/faiss/releases/download/3b14dad/faiss-1.12.0-py3-none-manylinux_2_35_x86_64.whl",
 ]
 inference-cpu = [
     "numpy==1.26.4",
